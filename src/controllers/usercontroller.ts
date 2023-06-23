@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import prisma from "../lib";
 import { v4 } from "uuid";
 export async function createUser(req: Request, res: Response) {
