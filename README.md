@@ -1,2 +1,2 @@
 # RegretfulBackend
-# Built with Express, MongoDB, Prisma
+## Built with Express, MongoDB, Prisma, Typescript
