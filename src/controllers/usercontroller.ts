@@ -19,7 +19,7 @@ export async function createUser(req: Request, res: Response) {
   }
 }
 
-export async function getAccount(req: any, res: any) {
+export async function getAccount(req: Request, res: Response) {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -30,6 +30,26 @@ export async function getAccount(req: any, res: any) {
     console.log(user);
 
     if (user) res.json({ user, id: user.id, message: "found user" });
+  } catch (error) {
+    res.status(401).json({ error, message: "Can't find user" });
+  }
+}
+
+export async function blockAccount(req: Request, res: Response) {
+  const blockingid = req.params.id;
+  const userid = req.headers.authorization;
+  try {
+    const user = await prisma.user.update({
+      where: {
+        id: userid,
+      },
+      data: {
+        blocked: { push: blockingid },
+      },
+    });
+    console.log(user);
+
+    if (user) res.json({ user, id: user.id, message: "blocked user" });
   } catch (error) {
     res.status(401).json({ error, message: "Can't find user" });
   }

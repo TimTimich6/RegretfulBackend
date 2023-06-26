@@ -116,17 +116,40 @@ export async function unlikePost(req: any, res: Response) {
   }
 }
 
+export async function flagPost(req: any, res: Response) {
+  const postid: string = req.params.id;
+  // console.log(postid);
+
+  try {
+    const story = await prisma.story.update({ where: { id: postid }, data: { flagged: { set: true } } });
+    if (story) {
+      res.json({ status: 200, message: "flagged", story });
+    }
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({ status: 200, message: "unliked" });
+  }
+}
+
 export async function getAll(req: any, res: Response) {
   try {
+    console.log("userid", req.headers.authorization);
+
+    const user = await prisma.user.findFirstOrThrow({ where: { id: req.headers.authorization }, select: { blocked: true } });
     const stories = await prisma.story.findMany({
-      select: { authorId: true, content: true, id: true, likes: { select: { userId: true, id: true } } },
+      orderBy: { createdAt: "desc" },
+      where: { NOT: { authorId: { in: user?.blocked } } },
+      select: { authorId: true, likes: true, flagged: true, content: true, id: true, createdAt: true },
     });
     if (stories) {
-      // console.log(stories.forEach((story) => console.log(story.likes)));
+      console.log(stories);
 
       res.json(stories);
     }
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ status: 200, message: "created" });
   }
 }

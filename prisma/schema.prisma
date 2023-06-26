@@ -8,33 +8,46 @@ datasource db {
 }
 
 model Story {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  author    User      @relation( "Authored", fields: [authorId], references: [id])
-  authorId  String    @db.ObjectId
-  content   String
-  createdAt DateTime  @default(now())
-  likes Like[] 
-  reported Boolean @default(false)
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  author      User     @relation("Authored", fields: [authorId], references: [id])
+  authorId    String   @db.ObjectId
+  content     String
+  createdAt   DateTime @default(now())
+  likes       Like[]
+  flagged     Boolean  @default(false)
   reportByIds String[] @db.ObjectId
-  @@index([authorId])
 
+  @@index([authorId])
 }
 
 model User {
-  id      String    @id @default(auto()) @map("_id") @db.ObjectId
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
   hash    String
-  Story   Story[] @relation("Authored")
-  liked    Like[]   
+  Story   Story[]  @relation("Authored")
+  liked   Like[]
+  blocked String[] @db.ObjectId @default([])
 }
+// model Block {
+//   id     String @id @default(auto()) @map("_id") @db.ObjectId
+//   blocking   User  @relation("blocking",fields: [blockingId], references: [id])
+//   blockingId String @db.ObjectId
+//   blocker   User   @relation("blocker",fields: [blockerId], references: [id])
+//   blockerId String @db.ObjectId()
+
+//   @@unique([blockerId, blockingId])
+// }
+
 model Like {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
   post   Story  @relation(fields: [postId], references: [id])
-  postId String @db.ObjectId 
+  postId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
   userId String @db.ObjectId()
-  @@unique([postId,userId])
 
+  @@unique([postId, userId])
 }
+
+
 // model Comment {
 //   id       String @id @default(auto()) @map("_id") @db.ObjectId
 //   story    Story  @relation(fields: [storyId], references: [id])
@@ -45,5 +58,3 @@ model Like {
 
 //   @@ignore
 // }
-
-

@@ -3,6 +3,8 @@ import * as controller from "../controllers/postcontroller";
 const router = Router();
 
 router.put("/like/:id", controller.likePost);
+router.put("/flag/:id", controller.flagPost);
+
 router.delete("/like/:id", controller.unlikePost);
 router.get("/filtered", controller.getFiltered);
 router.get("/:id", controller.getPost);
