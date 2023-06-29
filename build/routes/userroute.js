@@ -28,5 +28,6 @@ const controller = __importStar(require("../controllers/usercontroller"));
 const router = (0, express_1.Router)();
 router.get("/:id", controller.getAccount);
 router.post("/", controller.createUser);
+router.put("/block/:id", controller.blockAccount);
 exports.default = router;
 //# sourceMappingURL=userroute.js.map

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAll = exports.unlikePost = exports.likePost = exports.getFiltered = exports.getPost = exports.createPost = void 0;
+exports.getAll = exports.flagPost = exports.unlikePost = exports.likePost = exports.getFiltered = exports.getPost = exports.createPost = void 0;
 const index_1 = __importDefault(require("../lib/index"));
 function createPost(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -128,18 +128,40 @@ function unlikePost(req, res) {
     });
 }
 exports.unlikePost = unlikePost;
+function flagPost(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const postid = req.params.id;
+        // console.log(postid);
+        try {
+            const story = yield index_1.default.story.update({ where: { id: postid }, data: { flagged: { set: true } } });
+            if (story) {
+                res.json({ status: 200, message: "flagged", story });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({ status: 200, message: "unliked" });
+        }
+    });
+}
+exports.flagPost = flagPost;
 function getAll(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            console.log("userid", req.headers.authorization);
+            const user = yield index_1.default.user.findFirstOrThrow({ where: { id: req.headers.authorization }, select: { blocked: true } });
             const stories = yield index_1.default.story.findMany({
-                select: { authorId: true, content: true, id: true, likes: { select: { userId: true, id: true } } },
+                orderBy: { createdAt: "desc" },
+                where: { NOT: { authorId: { in: user === null || user === void 0 ? void 0 : user.blocked } } },
+                select: { authorId: true, likes: true, flagged: true, content: true, id: true, createdAt: true },
             });
             if (stories) {
-                // console.log(stories.forEach((story) => console.log(story.likes)));
+                console.log(stories);
                 res.json(stories);
             }
         }
         catch (error) {
+            console.log(error);
             res.status(500).json({ status: 200, message: "created" });
         }
     });

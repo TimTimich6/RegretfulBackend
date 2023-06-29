@@ -54,3 +54,25 @@ export async function blockAccount(req: Request, res: Response) {
     res.status(401).json({ error, message: "Can't find user" });
   }
 }
+
+export async function setFilter(req: Request, res: Response) {
+  const userid = req.headers.authorization;
+  const filterstring: string = req.body.filter;
+  const split = filterstring.trim().toLowerCase().split(";");
+  console.log(split);
+  try {
+    const user = await prisma.user.update({
+      where: {
+        id: userid,
+      },
+      data: {
+        filters: { set: split },
+      },
+    });
+    console.log(user);
+
+    if (user) res.json({ user, id: user.id, message: "filter set" });
+  } catch (error) {
+    res.status(401).json({ error, message: "Can't set filter or cant find user" });
+  }
+}

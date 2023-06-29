@@ -27,6 +27,7 @@ const express_1 = require("express");
 const controller = __importStar(require("../controllers/postcontroller"));
 const router = (0, express_1.Router)();
 router.put("/like/:id", controller.likePost);
+router.put("/flag/:id", controller.flagPost);
 router.delete("/like/:id", controller.unlikePost);
 router.get("/filtered", controller.getFiltered);
 router.get("/:id", controller.getPost);

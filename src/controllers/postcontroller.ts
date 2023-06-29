@@ -132,18 +132,19 @@ export async function flagPost(req: any, res: Response) {
   }
 }
 
-export async function getAll(req: any, res: Response) {
+export async function getAll(req: Request, res: Response) {
   try {
-    console.log("userid", req.headers.authorization);
+    const userid = req.headers.authorization;
+    console.log("userid", userid);
 
-    const user = await prisma.user.findFirstOrThrow({ where: { id: req.headers.authorization }, select: { blocked: true } });
+    const user = await prisma.user.findFirst({ where: { id: userid }, select: { blocked: true, filters: true } }).catch(() => null);
     const stories = await prisma.story.findMany({
       orderBy: { createdAt: "desc" },
-      where: { NOT: { authorId: { in: user?.blocked } } },
+      ...(user && { where: { NOT: { authorId: { in: user?.blocked } }, AND: { content: { in: user.filters } } } }),
       select: { authorId: true, likes: true, flagged: true, content: true, id: true, createdAt: true },
     });
     if (stories) {
-      console.log(stories);
+      // console.log(stories);
 
       res.json(stories);
     }

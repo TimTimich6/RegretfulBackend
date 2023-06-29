@@ -26,6 +26,7 @@ model User {
   Story   Story[]  @relation("Authored")
   liked   Like[]
   blocked String[] @db.ObjectId @default([])
+  filters String[] @default([]) 
 }
 // model Block {
 //   id     String @id @default(auto()) @map("_id") @db.ObjectId

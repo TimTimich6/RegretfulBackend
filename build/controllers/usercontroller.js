@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAccount = exports.createUser = void 0;
+exports.blockAccount = exports.getAccount = exports.createUser = void 0;
 const lib_1 = __importDefault(require("../lib"));
 const uuid_1 = require("uuid");
 function createUser(req, res) {
@@ -56,4 +56,27 @@ function getAccount(req, res) {
     });
 }
 exports.getAccount = getAccount;
+function blockAccount(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const blockingid = req.params.id;
+        const userid = req.headers.authorization;
+        try {
+            const user = yield lib_1.default.user.update({
+                where: {
+                    id: userid,
+                },
+                data: {
+                    blocked: { push: blockingid },
+                },
+            });
+            console.log(user);
+            if (user)
+                res.json({ user, id: user.id, message: "blocked user" });
+        }
+        catch (error) {
+            res.status(401).json({ error, message: "Can't find user" });
+        }
+    });
+}
+exports.blockAccount = blockAccount;
 //# sourceMappingURL=usercontroller.js.map
